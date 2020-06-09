@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('css')
-<link rel="stylesheet" href="css/home-custom.css">
+<link rel="stylesheet" href="{{asset('css/home-custom.css')}}">
 @stop
 @section('page_title', 'Trang chủ')
 @section('banner-area')
@@ -56,7 +56,7 @@
     <div class="container">
       <div class="row align-items-center">
         <div class="col-lg-6 home-about-left">
-          <h1>About Our Story</h1>
+          <h1>Câu chuyện của chúng tôi</h1>
           <p>
             Who are in extremely love with eco friendly system. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
           </p>
@@ -77,109 +77,64 @@
       <div class="row d-flex justify-content-center">
         <div class="menu-content pb-70 col-lg-8">
           <div class="title text-center">
-            <h1 class="mb-10">What kind of Foods we serve for you</h1>
-            <p>Who are in extremely love with eco friendly system.</p>
+            <h1 class="mb-10">Thực đơn của Salad Corner</h1>
+            <p>Dành cho những bạn theo chế độ giảm cân Eatclean, Keto ...</p>
           </div>
         </div>
       </div>
 
       <ul class="filter-wrap filters col-lg-12 no-padding">
-          <li class="active" data-filter="*">All Menu</li>
-          <li data-filter=".breakfast">Breakfast</li>
-          <li data-filter=".lunch">Lunch</li>
-          <li data-filter=".dinner">Dinner</li>
-          <li data-filter=".budget-meal">Salad</li>
-          <li data-filter=".buffet">Đồ Uống & Detox</li>
+          <li class="active" data-filter="*">Tất cả</li>
+          <li data-filter=".breakfast">Bữa sáng</li>
+          <li data-filter=".lunch">Bữa trưa</li>
+          <li data-filter=".dinner">Bữa tối</li>
+          <li data-filter=".salad">Salad</li>
+          <li data-filter=".drink">Đồ Uống & Detox</li>
           <li data-filter=".other">Các Món Đi Kèm</li>
       </ul>
 
       <div class="filters-content">
 
         <div class="row grid">
-          <div class="col-md-6 all breakfast">
-                <div class="single-menu">
-                  <div class="title-wrap d-flex justify-content-between">
-                    <h4>Cappuccion</h4>
-                    <h4 class="price">$49</h4>
-                  </div>
-                  <p>
-                    Usage of the Internet is becoming more common due to rapid advance.
-                  </p>
+          @foreach($products as $product)
+            <?php
+              switch ($product->schedule_type) {
+                case 0:
+                  $scheduleTypeClass = "breakfast";
+                  break;
+                case 1:
+                  $scheduleTypeClass = "lunch";
+                  break;
+                default:
+                  $scheduleTypeClass = "dinner";
+                  break;
+              }
+
+              switch ($product->product_type) {
+                case 0:
+                  $productType = "salad";
+                  break;
+                case 1:
+                  $productType = "drink";
+                  break;
+                default:
+                  $productType = "other";
+                  break;
+              }
+            ?>
+            <div class="col-md-6 all {{$scheduleTypeClass}} {{$productType}} ">
+              <div class="row">
+                <div class="single-gallery col-md-6">
+                  <img class="img-fluid" src="{{$product->thumbnail_image}}" alt="">
                 </div>
-          </div>
-
-          <div class="col-md-6 all dinner">
-                <div class="single-menu">
-                  <div class="title-wrap d-flex justify-content-between">
-                    <h4>Americano</h4>
-                    <h4 class="price">$49</h4>
-                  </div>      
-                  <p>
-                    Usage of the Internet is becoming more common due to rapid advance.
-                  </p>
+                <div class="col-md-6">
+                  <a href="{{route('product-detail', $product->id)}}"><h4>{{$product->name}}</h4></a>
+                  <p>{{$product->short_description}}</p>
+                  <span class="price">${{$product->original_price}}</span>
                 </div>
-          </div>
-
-          <div class="col-md-6 all budget-meal">
-            <div class="single-menu">
-              <div class="title-wrap d-flex justify-content-between">
-                <h4>Macchiato</h4>
-                <h4 class="price">$49</h4>
               </div>
-              <p>
-                Usage of the Internet is becoming more common due to rapid advance.
-              </p>
             </div>
-          </div>
-
-          <div class="col-md-6 all breakfast">
-            <div class="single-menu">
-              <div class="title-wrap d-flex justify-content-between">
-                <h4>Mocha</h4>
-                <h4 class="price">$49</h4>
-              </div>
-              <p>
-                Usage of the Internet is becoming more common due to rapid advance.
-              </p>                  
-            </div>
-          </div>
-
-          <div class="col-md-6 all lunch">
-            <div class="single-menu">
-              <div class="title-wrap d-flex justify-content-between">
-                <h4>Piccolo Latte</h4>
-                <h4 class="price">$49</h4>
-              </div>
-              <p>
-                Usage of the Internet is becoming more common due to rapid advance.
-              </p>                  
-            </div>
-          </div>
-
-          <div class="col-md-6 all buffet">
-            <div class="single-menu">
-              <div class="title-wrap d-flex justify-content-between">
-                <h4>Ristretto</h4>
-                <h4 class="price">$49</h4>
-              </div>
-              <p>
-                Usage of the Internet is becoming more common due to rapid advance.
-              </p>                  
-            </div>
-          </div> 
-
-          <div class="col-md-6 all other">
-            <div class="single-menu">
-              <div class="title-wrap d-flex justify-content-between">
-                <h4>Ristretto</h4>
-                <h4 class="price">$49</h4>
-              </div>
-              <p>
-                Usage of the Internet is becoming more common due to rapid advance.
-              </p>                  
-            </div>
-          </div>
-
+          @endforeach
         </div>
 
       </div>
