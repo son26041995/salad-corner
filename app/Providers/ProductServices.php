@@ -5,12 +5,13 @@ use DB;
 
 class ProductServices
 {
-    public function getProduct()
+    public function getListProducts()
     {
-        list('min' => $startYear, 'max' => $endYear) = $this->industryStatisticRepository->getMinAndMaxYear();
+        dd("Xxxxxxxx");
+        /*list('min' => $startYear, 'max' => $endYear) = $this->industryStatisticRepository->getMinAndMaxYear();
         return [
             'start_year' => $startYear,
             'end_year' => $endYear,
-        ];
+        ];*/
     }
 }

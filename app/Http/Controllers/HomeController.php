@@ -3,19 +3,35 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Services\ProductServices;
+use App\Services\PostServices;
 
 class HomeController extends Controller
 {
-    public function __construct(
-        ProductServices $productServices
-    ) {
-        $this->productServices = $productServices;
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct(PostServices $postServices)
+    {
+        $this->middleware('auth');
+        $this->postServices = $postServices;
     }
 
-    public function index ()
+    /**
+     * Show the application dashboard.
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function index()
     {
-        $products = DB::table('products')->get();
-        return view('home.home', ['products' => $products]);
+        $posts = $this->postServices->getListPosts();
+
+        return view('home.home', ['posts' => $posts]);
+    }
+
+    public function testapi()
+    {
+        dd("aaa");
     }
 }
