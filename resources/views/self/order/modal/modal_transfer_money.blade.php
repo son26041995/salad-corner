@@ -23,9 +23,9 @@
                     </tbody>
                 </table>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="overflow: scroll;">
                 <label for="table-list-transaction">Danh sách đơn chưa chuyển khoản</label>
-                <table style="overflow: scroll;" class="table table-bordered" id="table-list-transaction">
+                <table class="table table-bordered" id="table-list-transaction">
                     <thead class="thead-light ">
                       <tr>
 
@@ -43,55 +43,38 @@
                           <th scope="col">Mã vận đơn</th>
                           <th scope="col">Mã đơn hàng</th>
                           <th scope="col">Nick đặt</th>
-                          <th scope="col">Ngày tạo</th>
+                          <th scope="col">Ngày đặt đơn</th>
                       </tr>
                     </thead>
                     <tbody>
-                        <?php $k = 0; $postHistoriesNotTransfers =  getTransactionNotTransfer('basePostId', $postHistories); ?>
-                        @foreach ($postHistoriesNotTransfers as $basePostId => $listTransactions )
-                            <?php $numberRowspan =  count($listTransactions); ?>
+                        <?php $k = 0; ?>
+                        @foreach ($postHistories as $transaction)
+                          @if ($transaction->transaction_status == 1)
                             <tr
-                                data-transactionid="{{$listTransactions[0]->id}}"
-                                data-transactionstatus="{{ $listTransactions[0]->transaction_status }}"
-                                data-transactioncode="{{ $listTransactions[0]->transaction_code }}"
-                                data-money="{{ $listTransactions[0]->money_cod }}"
+                                data-transactionid="{{$transaction->id}}"
+                                data-transactionstatus="{{ $transaction->transaction_status }}"
+                                data-transactioncode="{{ $transaction->transaction_code }}"
+                                data-money="{{ $transaction->money_cod }}"
                             >
-                                
-                                <th rowspan="{{ $numberRowspan }}" scope="row">
+                                <th scope="row">
                                     <div class="custom-control custom-checkbox">
                                         <input type="checkbox" class="custom-control-input selectTransaction" id="customCheck{{$k}}">
                                         <label class="custom-control-label" for="customCheck{{$k}}">{{ ++$k }}</label>
                                     </div>
                                 </th>
-                                <td rowspan="{{ $numberRowspan }}">{{ $listTransactions[0]->authorname }}</td>
-                                <td rowspan="{{ $numberRowspan }}">{{ $listTransactions[0]->content }}</td>
-                                <td rowspan="{{ $numberRowspan }}">{{ $listTransactions[0]->status }}</td>
-                                <td rowspan="{{ $numberRowspan }}">{{ $listTransactions[0]->post_created }}</td>
-                                <td>{{ $listTransactions[0]->member }}</td>
-                                <td>{{ getTransactionOrderStatus($listTransactions[0]->transaction_status) }}</td>
-                                <td>{{ $listTransactions[0]->money_cod }}</td>
-                                <td>{{ $listTransactions[0]->transaction_code }}</td>
-                                <td>{{ $listTransactions[0]->order_code }}</td>
-                                <td>{{ $listTransactions[0]->link_shopee }}</td>
-                                <td>{{ $listTransactions[0]->created_at }}</td>
+                                <td>{{ $transaction->authorname }}</td>
+                                <td>{{ $transaction->content }}</td>
+                                <td>{{ $transaction->status }}</td>
+                                <td>{{ $transaction->post_created }}</td>
+                                <td>{{ $transaction->member }}</td>
+                                <td>{{ getTransactionOrderStatus($transaction->transaction_status) }}</td>
+                                <td>{{ $transaction->money_cod }}</td>
+                                <td>{{ $transaction->transaction_code }}</td>
+                                <td>{{ $transaction->order_code }}</td>
+                                <td>{{ $transaction->link_shopee }}</td>
+                                <td>{{ $transaction->created_at }}</td>
                             </tr>
-                            @foreach ($listTransactions as $num => $transaction )
-                                @if($num !== 0)
-                                    <tr data-transactionid="{{ $transaction->id }}"
-                                        data-transactionstatus="{{ $transaction->transaction_status }}"
-                                        data-transactioncode="{{ $transaction->transaction_code }}"
-                                        data-money="{{ $transaction->money_cod }}"
-                                        >
-                                        <td>{{ $transaction->member }}</td>
-                                        <td>{{ getTransactionOrderStatus($transaction->transaction_status) }}</td>
-                                        <td>{{ $transaction->money_cod }}</td>
-                                        <td>{{ $transaction->transaction_code }}</td>
-                                        <td>{{ $transaction->order_code }}</td>
-                                        <td>{{ $transaction->link_shopee }}</td>
-                                        <td>{{ $transaction->created_at }}</td>
-                                    </tr>
-                                @endif
-                            @endforeach
+                            @endif
                         @endforeach
                       
                       

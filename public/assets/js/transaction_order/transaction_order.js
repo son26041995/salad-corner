@@ -239,4 +239,54 @@ $(document).ready(function() {
         })
        })
 
+       $('.btn-confirm-order-success').on('click', function() {
+            const transactionId = $(this).parents('tr').data('transactionid')
+            const transactionCode = $(this).parents('tr').data('transactioncode')
+
+            $('#modal_confirm_order_success').find('#transaction-id').val(transactionId)
+            $('#modal_confirm_order_success').find('#transaction-code').val(transactionCode)
+            $('#modal_confirm_order_success').find('#msg-confirm').text('Xác nhận đơn hàng có mã vận đơn: "' + transactionCode + '" đã giao thành công?')
+            $('#modal_confirm_order_success').modal()
+       })
+
+       $('#btn_submit_order_success').on('click', function() {
+        const transactionId = $('#modal_confirm_order_success').find('#transaction-id').val()
+        const url = window.location.origin + '/self/order/update-status'
+        $.ajax({
+            url,
+            type: 'POST',
+            data: {transactionId, nextStatus: 3},
+            dataType: 'json',
+            success: function(r){
+                window.location.reload()
+            }
+        })
+       })
+
+       $('.btn-confirm-receive-money').on('click', function() {
+            const transferId = $(this).parents('tr').data('transferid')
+            const money = $(this).parents('tr').data('money')
+            const member = $(this).parents('tr').data('member')
+
+            $('#modal_confirm_receive_money').find('#transfer-id').val(transferId)
+            $('#modal_confirm_receive_money').find('#member').val(member)
+            $('#modal_confirm_receive_money').find('#money').val(money)
+
+            $('#modal_confirm_receive_money').modal()
+       })
+
+       $('#btn_submit_transfer_money').on('click', function() {
+        const transferId = $('#modal_confirm_receive_money').find('#transfer-id').val()
+        const url = window.location.origin + '/admin/confirm-transfer-money'
+        $.ajax({
+            url,
+            type: 'POST',
+            data: {transferId},
+            dataType: 'json',
+            success: function(r){
+                window.location.reload()
+            }
+        })
+       })
+
 })

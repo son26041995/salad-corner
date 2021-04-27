@@ -44,6 +44,7 @@
   @include('self.order.modal.modal_transfer_money')
   @include('self.order.modal.modal_confirm_transfer_money')
   @include('self.order.modal.modal_confirm_cancel_order')
+  @include('self.order.modal.modal_confirm_order_success')
   <script type="text/javascript" src="{{ URL::asset('/assets/js/transaction_order/transaction_order.js') }}"></script>
 @endsection
 

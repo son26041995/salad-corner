@@ -99,7 +99,7 @@ class MemberServices
                                 'updated_at' => Carbon::now()]);
             $listTransactionId = array_column($transactionData, 'transactionId');
             DB::table('transactions_order')->whereIn('id', $listTransactionId)
-                    ->update(['transfer_money_history_id' => $transferMoneyHistoryId, 'transaction_status' => 2]);
+                    ->update(['transfer_money_history_id' => $transferMoneyHistoryId]);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -110,7 +110,11 @@ class MemberServices
 
     public function processSuccessOrder($transactionId)
     {
-
+        DB::table('transactions_order')->where('id', $transactionId)->update(
+            ['transaction_status' => 3,
+             'updated_at' => Carbon::now()
+            ]);
+        return;
     }
 
     public function processCancelOrder($transactionId)

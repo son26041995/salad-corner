@@ -30,3 +30,6 @@ Route::get('/self/order/', 'MemberController@orderHistory')->name('order-history
 Route::post('/self/order/update-status', 'MemberController@updateTransactionStatus')->name('update-transaction-status');
 Route::post('/self/order/transfer-money', 'MemberController@transferMoney')->name('transfer-money');
 
+Route::get('/admin/transfer-money-manager/', 'AdminController@manageTransferMoney')->name('manage-transfer-money');
+Route::post('/admin/confirm-transfer-money/', 'AdminController@receivedMoney')->name('received-money');
+

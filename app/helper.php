@@ -59,23 +59,14 @@
         }
     }
 
-    function getTransactionNotTransfer($key, $data)
+    function getTransferStatus($status)
     {
-        $responses = [];
-        foreach($data as $transactionOrder) {
-            $basePostId = $transactionOrder->$key;
-            if (isset($responses[$basePostId])) {
-                if ($transactionOrder->transaction_status == 1) {
-                    $responses[$basePostId][] = $transactionOrder;
-                }
-            } else {
-                if ($transactionOrder->transaction_status == 1) {
-                    $responses[$basePostId] = [$transactionOrder];
-                }
-            }
+        switch ($status) {
+            case 0:
+                return "Chưa xác nhận";
+            case 1:
+                return "Đã nhận";
         }
-
-        return $responses;
     }
 
     function uploadEvidence($image)

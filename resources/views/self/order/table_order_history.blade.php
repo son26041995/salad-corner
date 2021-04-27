@@ -17,7 +17,10 @@
     </thead>
     <tbody>
         @foreach ($orderHistory as $k => $transactionOrder )
-            <tr>
+            <tr data-transactionid="{{$transactionOrder->id}}"
+                data-transactionstatus="{{ $transactionOrder->transaction_status }}"
+                data-transactioncode="{{ $transactionOrder->transaction_code }}"
+                data-nickShopee="{{ $transactionOrder->link_shopee }}">
                 <th scope="row">{{ ++$k }}</th>
                 <td>{{ $transactionOrder->member }}</td>
                 <td>{{ $transactionOrder->content }}</td>
@@ -31,8 +34,8 @@
                 <td>{{ $transactionOrder->updated_at }}</td>
                 <td>
                     <div class="row">
-                        @if ($transactionOrder->transaction_status < 4 && $transactionOrder->transaction_status >= 2)
-                            <button type="button" class="btn btn-success btn-confirm-order">Đã nhận được hàng</button>
+                        @if ($transactionOrder->transaction_status == 2)
+                            <button type="button" class="btn btn-success btn-confirm-order-success">Đã nhận được hàng</button>
                         @endif
                         @if($transactionOrder->transaction_status == 0 || $transactionOrder->transaction_status == 1 || $transactionOrder->transaction_status == 2)
                             <button type="button" class="btn btn-danger btn-cancel-order">Hủy đơn</button>
