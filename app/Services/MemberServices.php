@@ -141,4 +141,71 @@ class MemberServices
         }
         return;
     }
+
+    public function getSelfTransferMoneyHistory()
+    {
+        $transferMoneyHistories = DB::table('transfer_money_history as trans')
+        ->select('trans.*', 'u.name as member')
+        ->leftJoin('users as u', 'u.id', '=', 'trans.user_id')
+        ->where('trans.user_id', Auth::id())
+        ->orderBy('trans.created_at', 'desc')
+        ->paginate(100);
+        return $transferMoneyHistories;
+    }
+
+    public function getOrderByTransferId($transferId)
+    {
+        $orders = DB::table('transactions_order as trans')
+        ->select('trans.*', 'u.name as member')
+        ->leftJoin('users as u', 'u.id', '=', 'trans.user_id')
+        ->where(['transfer_money_history_id' => $transferId ])
+        ->orderBy('trans.created_at', 'desc')
+        ->get();
+
+        return $orders;
+    }
+
+    public function getCoinHistories()
+    {
+        $coinHistories = DB::table('coin_histories as coin')
+        ->select('coin.*', 'u.name as member')
+        ->leftJoin('users as u', 'u.id', '=', 'coin.user_id')
+        ->where(['coin.user_id' => Auth::id()])
+        ->orderBy('coin.created_at', 'desc')
+        ->get();
+
+        return $coinHistories;
+    }
+
+    public function processAddCoin($coin, $evidence)
+    {
+        DB::table('coin_histories')
+                ->insert([ 'user_id' => Auth::id(),
+                                'coin' => $coin,
+                                'evidence' => $evidence,
+                                'created_at' => Carbon::now(),
+                                'updated_at' => Carbon::now()]);
+        return 1;
+    }
+
+    public function processConfirmAddCoin($coinHistoryId)
+    {
+        DB::beginTransaction();
+
+        try {
+            DB::table('coin_histories')
+                ->where([ 'id' => $coinHistoryId])->update(['is_confirm' => 1]);
+            $coinHistory = DB::table('coin_histories')->where([ 'id' => $coinHistoryId])->first();
+            $coin = $coinHistory->coin;
+            $user = DB::table('users')->where([ 'id' => $coinHistory->user_id])->first();
+            $newCoin = $user->point + $coin;
+            DB::table('users')->where([ 'id' => $coinHistory->user_id])->update(['point' => $newCoin]);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+        }
+        
+        return;
+    }
 }

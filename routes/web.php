@@ -26,10 +26,18 @@ Route::post('/post/create', 'PostController@create')->name('post-create');
 Route::get('/post/{id}', 'PostController@detail')->name('post-detail');
 Route::get('/post/member_submit_order/{id}', 'PostController@memberSubmitOrder')->name('member-submit-order');
 
+//self
 Route::get('/self/order/', 'MemberController@orderHistory')->name('order-history');
 Route::post('/self/order/update-status', 'MemberController@updateTransactionStatus')->name('update-transaction-status');
 Route::post('/self/order/transfer-money', 'MemberController@transferMoney')->name('transfer-money');
+Route::get('/self/order/transfer-money-history', 'MemberController@transferMoneyHistory')->name('transfer-money-history');
+Route::post('/self/order/view-order-by-transferid', 'MemberController@viewOrderByTransferId');
+Route::get('/self/coin/', 'MemberController@coinHistory');
+Route::post('/self/coin/add', 'MemberController@addCoin');
+Route::post('/self/coin/confirm_add_coin', 'MemberController@confirmAddCoin');
 
+
+//admin
 Route::get('/admin/transfer-money-manager/', 'AdminController@manageTransferMoney')->name('manage-transfer-money');
 Route::post('/admin/confirm-transfer-money/', 'AdminController@receivedMoney')->name('received-money');
 

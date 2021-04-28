@@ -24,7 +24,6 @@
                     <th scope="col">Đơn hàng</th>
                     <th scope="col">Ngày tạo</th>
                     <th scope="col">Ngày cập nhật</th>
-                    <th scope="col">Hành động</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -41,18 +40,10 @@
                             <td><button class="btn btn-primary btn-view-order-list">Xem đơn hàng</button></td>
                             <td>{{ $transferMoneyHistory->created_at }}</td>
                             <td>{{ $transferMoneyHistory->updated_at }}</td>
-                            <td>
-                                <div class="row">
-                                    @if ($transferMoneyHistory->is_received_money == 0)
-                                        <button type="button" class="btn btn-success btn-confirm-receive-money">Đã nhận được tiền</button>
-                                    @endif
-                                </div>
-                            </td>
                         </tr>      
                     @endforeach
                 </tbody>
               </table>
-              @include('admin.modal.modal_confirm_receive_money')
               @include('self.transfer.modal.modal_view_order_by_transferid')
         </div>
       </div>

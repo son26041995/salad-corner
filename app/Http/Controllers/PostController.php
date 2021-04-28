@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use DB;
+use Auth;
 use App\Services\PostServices;
 
 class PostController extends Controller
@@ -41,6 +43,10 @@ class PostController extends Controller
 
             ), 400); // 400 being the HTTP code for an invalid request.
         }
+
+        $currentUser = DB::table('users')->where('id', Auth::id())->first();
+        if ($currentUser->point < $request->coinPay) return 'not enough point';
+
         $image = $request->file('thumbnail');
         $filePath = uploadThumbnailPost($image);
         $data = $request->all();

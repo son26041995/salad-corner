@@ -88,6 +88,7 @@ $(document).ready(function() {
         var ext = $('#capture_transfer').val().split('.').pop().toLowerCase();
         if($.inArray(ext, ['gif','png','jpg','jpeg']) == -1) {
             alert('invalid extension!');
+            return
         }
         if (!transactionData || !money || !evidenceLength) return
 
@@ -157,9 +158,10 @@ $(document).ready(function() {
         var ext = $('#form-create-post').find("#thumbnail").val().split('.').pop().toLowerCase();
         if($.inArray(ext, ['gif','png','jpg','jpeg']) == -1) {
             alert('invalid extension!');
+            return
         }
         const productData = getProductData()
-        console.log(66666666, productData.length)
+
         if (!title || !content || !thumbLength || !numberOrder || !coinPay || !requirementPayment || !isApplyFreeship || productData.length == 0) return
 
         var formData = new FormData();
@@ -181,7 +183,12 @@ $(document).ready(function() {
             contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
             processData: false, 
             success: function(r){
-                window.location.reload()
+                console.log(222222, r)
+                if (r == 'not enough point') {
+                    $('.alert-danger').empty().append('<p>Không đủ coin để thưởng </p>').removeClass('d-none')
+                } else {
+                    window.location.reload()
+                }
             },
             error: function(data) {
                 var errors = JSON.parse(data.responseText);
@@ -288,5 +295,119 @@ $(document).ready(function() {
             }
         })
        })
+
+       $('.btn-view-order-list').on('click', function() {
+        const transferId = $(this).parents('tr').data('transferid')
+        const url = window.location.origin + '/self/order/view-order-by-transferid'
+        $.ajax({
+            url,
+            type: 'POST',
+            data: {transferId},
+            dataType: 'json',
+            success: function(data){
+                console.log(666666, data)
+                let idx = 0
+                let tbody = ''
+                let totalMoney = 0
+                for (let i = 0; i< data.length; i++) {
+                    ++idx
+                    totalMoney += data[i].money_cod
+                    const tr = '<tr>' +
+                                    '<td>' + idx + '</td>' +
+                                    '<td>' + data[i].member  + '</td>' +
+                                    '<td>' + getTransactionStatus(data[i].transaction_status)  + '</td>' +
+                                    '<td>' + data[i].money_cod  + '</td>' +
+                                    '<td>' + data[i].transaction_code  + '</td>' +
+                                    '<td>' + data[i].order_code  + '</td>' +
+                                    '<td>' + data[i].shopee_link  + '</td>' +
+                                    '<td>' + data[i].created_at  + '</td>' +
+                                '</tr>'
+                    tbody += tr
+                }
+                $('#table-list-transaction-by-transferid').find('tbody').empty().append(tbody)
+                $('#modal_view_order_by_transfer_id').find('#total').text("Tổng tiền: " + totalMoney)
+                $('#modal_view_order_by_transfer_id').modal()
+            }
+        })
+       })
+       
+       function getTransactionStatus(status)
+       {
+        switch (status) {
+            case 0:
+                return "Vừa gửi yêu cầu đặt";
+            case 1:
+                return "Xác nhận đã đặt";
+            case 2:
+                return "Chủ shop đã ck tiền cho hệ thống";
+            case 3:
+                return "Đơn thành công";
+            case 4:
+                return "Đơn thất bại";
+        }
+       }
+
+        $('#btn-add-coin').on('click', function() {
+            $('#modal_add_coin').modal()
+        })
+
+        $('#coin-recharged').on('keyup', function() {
+            const coin = $(this).val()
+            $('#modal_add_coin').find('#money-coin').text(coin * 1000 + 'VND')
+        })
+
+        $('#btn_submit_add_coin').on('click', function() {
+            var fileInput = $.trim($("#capture_transfer").val());
+            const evidenceLength = fileInput && fileInput !== ''
+            const coin = $('#coin-recharged').val()
+            const url = window.location.origin + '/self/coin/add'
+
+            var ext = $('#capture_transfer').val().split('.').pop().toLowerCase();
+            if($.inArray(ext, ['gif','png','jpg','jpeg']) == -1) {
+                alert('invalid extension!');
+                return
+            }
+            if (!coin || !evidenceLength) return
+            var formData = new FormData();
+            formData.append('coin', coin);
+            // Attach file
+            formData.append('evidence', $('#modal_add_coin').find('#capture_transfer')[0].files[0]); 
+            $.ajax({
+                url,
+                type: 'POST',
+                data: formData,
+                contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+                processData: false, 
+                success: function(r){
+                    window.location.reload()
+                }
+            })
+        })
+
+        $('.btn-confirm-received-coin').on('click', function() {
+            const coinHistoryId = $(this).parents('tr').data('coinhistoryid')
+            const member = $(this).parents('tr').data('member')
+            const coin = $(this).parents('tr').data('coin')
+            $('#modal-confirm-received-coin').find('#coin-history-id').val(coinHistoryId)
+            $('#modal-confirm-received-coin').find('#member').val(member)
+            $('#modal-confirm-received-coin').find('#coin-number').val(coin)
+            $('#modal-confirm-received-coin').find('#money').val(coin * 1000)
+            $('#modal-confirm-received-coin').modal()
+        })
+
+        $('#btn_submit_received_coin').on('click', function() {
+            $('#modal-confirm-received-coin').modal('hide')
+            const coinHistoryId = $('#modal-confirm-received-coin').find('#coin-history-id').val()
+            const url = window.location.origin + '/self/coin/confirm_add_coin'
+            $.ajax({
+                url,
+                type: 'POST',
+                data: { coinHistoryId },
+                dataType: 'json',
+                success: function(r){
+                    window.location.reload()
+                }
+            })
+        })
 
 })
