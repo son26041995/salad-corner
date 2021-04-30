@@ -114,6 +114,24 @@ $(document).ready(function() {
         $('#modal_create_new_post').modal()
     })
 
+    $('.btn-delete-post').on('click', function() {
+        $('#modal_confirm_delete_post').find('#post-id').val($('#postId').val())
+        $('#modal_confirm_delete_post').modal()
+    })
+
+    $('#btn_submit_delete_post').on('click', function() {
+        const id = $('#modal_confirm_delete_post').find('#post-id').val()
+        const url = window.location.origin + '/post/delete/' + id
+        $.ajax({
+            url,
+            type: 'POST',
+            contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+            success: function(r){
+                window.location.reload()
+            }
+        })
+    })
+
     function readURL(input) {
         if (input.files && input.files[0]) {
           var reader = new FileReader();
@@ -175,6 +193,60 @@ $(document).ready(function() {
         // Attach file
         formData.append('thumbnail', $('#form-create-post').find("#thumbnail")[0].files[0]);
         const url = window.location.origin + '/post/create'
+        $.ajax({
+            url,
+            type: 'POST',
+            data: formData,
+            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+            contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+            processData: false, 
+            success: function(r){
+                console.log(222222, r)
+                if (r == 'not enough point') {
+                    $('.alert-danger').empty().append('<p>Không đủ coin để thưởng </p>').removeClass('d-none')
+                } else {
+                    window.location.reload()
+                }
+            },
+            error: function(data) {
+                var errors = JSON.parse(data.responseText);
+                console.log(2222,errors);
+                $('.alert-danger').empty().append('<p>' + errors.message + '</p>').removeClass('d-none')
+            }
+        })
+      })
+
+      $('#btn_edit_create_new_post').on('click', function() {
+        const title = $('#form-edit-post').find('#title').val()
+        const content = $('#form-edit-post').find('#content').val()
+        const thumb = $.trim($('#form-edit-post').find("#thumbnail").val());
+        const thumbLength = thumb && thumb !== ''
+        const requirementPayment = $('#form-edit-post').find('#requirement_payment').val()
+        const isApplyFreeship = $('#form-edit-post').find('#is_apply_freeship').val()
+        const postId = $('#form-edit-post').find('#post_id').val()
+
+        var ext = $('#form-edit-post').find("#thumbnail").val().split('.').pop().toLowerCase();
+
+        if(thumbLength && $.inArray(ext, ['gif','png','jpg','jpeg']) == -1) {
+            alert('invalid extension!');
+            return
+        }
+        const productData = getProductData()
+
+        if (!title || !content || !requirementPayment || !isApplyFreeship || productData.length == 0) return
+
+        var formData = new FormData();
+        formData.append('title', title);
+        formData.append('content', content);
+        formData.append('requirementPayment', requirementPayment);
+        formData.append('isApplyFreeship', isApplyFreeship);
+        formData.append('productData', JSON.stringify(productData));
+        // Attach file
+        if (thumbLength) {
+            formData.append('thumbnail', $('#form-edit-post').find("#thumbnail")[0].files[0]);
+        }
+
+        const url = window.location.origin + '/post/edit/' + postId
         $.ajax({
             url,
             type: 'POST',

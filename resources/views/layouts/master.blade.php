@@ -80,7 +80,7 @@
 
     <script src="assets/js/app.js"></script>
     <script src="assets/js/theme.js"></script>
-    
+    @include('home.modal.modal_create_new_post')
     <footer class="footer pt-5 pb-5 text-center">
         
     <div class="container">

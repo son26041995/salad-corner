@@ -220,7 +220,6 @@
       </div>
     </div>
      <script type="text/javascript" src="{{ URL::asset('assets/js/transaction_order/transaction_order.js') }}"></script>
-     @include('home.modal.modal_create_new_post')
   </div>
   
   {{ $posts->links() }}

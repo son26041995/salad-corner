@@ -40,11 +40,12 @@ class MemberServices
     public function processUpdateTransactionStatus($transactionId, $nextStatus, $money = null, $transactionCode = null, $orderCode = null)
     {
         DB::beginTransaction();
-
+        $trans = DB::table('transactions_order')->where('id', $transactionId)->first();
         try {
             switch($nextStatus) {
                 case 1:
                     $this->processConfirmOrder($transactionId, $money, $transactionCode, $orderCode);
+                    $this->processUpdateOrderRemaining($trans->post_id, 'sub');
                     $this->processAddCoinToMember($transactionId);
                     break;
                 case 3:
@@ -52,6 +53,7 @@ class MemberServices
                     break;
                 default:
                     $this->processCancelOrder($transactionId);
+                    $this->processUpdateOrderRemaining($trans->post_id, 'add');
             }
             DB::commit();
         } catch (\Exception $e) {
@@ -72,6 +74,8 @@ class MemberServices
              'order_code' => $orderCode,
              'updated_at' => Carbon::now()
             ]);
+        /* Set number order remaining */
+
         return 1;
     }
 
@@ -83,6 +87,23 @@ class MemberServices
         $point = DB::table('users')->where('id', $transaction->user_id)->first()->point;
         DB::table('users')->where('id', $transaction->user_id)->update(['point' => $point + $coinPay]);
 
+        return 1;
+    }
+
+    public function processUpdateOrderRemaining($postId, $option)
+    {
+        $post = DB::table('posts')->where('id', $postId)->first();
+        $currentNumberOrderRemaining = $post->number_order_remaining;
+
+        if ($option == 'add') {
+            $numberOrderRemainingUpdate = $currentNumberOrderRemaining + 1;
+        } else {
+            $numberOrderRemainingUpdate = $currentNumberOrderRemaining - 1;
+        }
+
+        DB::table('posts')->where('id', $postId)->update(
+            ['number_order_remaining' => $numberOrderRemainingUpdate,
+             'updated_at' => Carbon::now()]);
         return 1;
     }
 

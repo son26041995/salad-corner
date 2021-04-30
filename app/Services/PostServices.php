@@ -19,7 +19,20 @@ class PostServices
         $products = DB::table('posts as p')
             ->select('p.id as postId', 'p.*', 'u.*')
             ->leftjoin('users as u', 'u.id', '=', 'p.user_id')
+            ->where('p.is_deleted', 0)
             ->orderBy('p.created_at', 'desc')
+            ->paginate(100);
+
+        return $products;
+    }
+
+    public function getPostMoreLikeThis()
+    {
+        $products = DB::table('posts as p')
+            ->select('p.id as postId', 'p.*', 'u.*')
+            ->leftjoin('users as u', 'u.id', '=', 'p.user_id')
+            ->where('p.is_deleted', 0)
+            ->inRandomOrder()
             ->paginate(10);
 
         return $products;
@@ -63,6 +76,7 @@ class PostServices
                     'title' => $data['title'],
                     'status' => 1,
                     'number_order' => $data['numberOrder'],
+                    'number_order_remaining' => $data['numberOrder'],
                     'coin_pay' => $data['coinPay'],
                     'requirement_payment' => $data['requirementPayment'],
                     'is_apply_freeship' => $data['isApplyFreeship'],
@@ -71,6 +85,53 @@ class PostServices
                     'updated_at' => Carbon::now()]
             );
 
+            $productData = json_decode($data['productData']);
+            $dataInserts = [];
+
+            foreach ($productData as $key => $prd) {
+                $dataInserts[] = [  'post_id' => $id,
+                                    'url' => $prd->productLink,
+                                    'number' => $prd->qty,
+                                    'created_at' => Carbon::now(),
+                                    'updated_at' => Carbon::now()
+                                ];
+            }
+            DB::table('post_product_links')->insert($dataInserts);
+
+            $user = DB::table('users')->where('id', Auth::id())->first();
+            $currentCoin = $user->point;
+            $coinUpdate = $currentCoin - ($data['coinPay'] * $data['numberOrder']);
+            DB::table('users')->where('id', Auth::id())->update(['point' => $coinUpdate]);
+
+            DB::commit();
+            return;
+        } catch (\Exception $e) {
+            DB::rollback();
+            return;
+            // something went wrong
+        }
+    }
+
+    public function processEditPost($data, $id)
+    {
+        if (DB::table('posts')->where('id', $id)->first()->user_id !== Auth::id()) return;
+        DB::beginTransaction();
+
+        $dataUpdate = [ 'content' => $data['content'],
+                        'user_id' => Auth::id(),
+                        'title' => $data['title'],
+                        'status' => 1,
+                        'requirement_payment' => $data['requirementPayment'],
+                        'is_apply_freeship' => $data['isApplyFreeship'],
+                        'updated_at' => Carbon::now()];
+        if (isset($data['image'])) {
+            $dataUpdate['image'] = $data['image'];
+        }
+
+        try {
+            DB::table('posts')->where('id', $id)->update($dataUpdate);
+
+            DB::table('post_product_links')->where('post_id', $id)->delete();
             $productData = json_decode($data['productData']);
             $dataInserts = [];
 
@@ -90,6 +151,11 @@ class PostServices
             return;
             // something went wrong
         }
-        
+    }
+
+    public function processDeletePost($id)
+    {
+        DB::table('posts')->where('id', $id)->update(['is_deleted' => 1]);
+        return ;
     }
 }

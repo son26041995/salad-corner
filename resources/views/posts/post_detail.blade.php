@@ -13,8 +13,12 @@
           <article class="card">
           <img class="card-img-top mb-2" src="{{asset('storage/'.$post->image)}}" alt="Card image">
           <div class="card-body">
+            @if ($post->is_deleted)
+            <div class="alert alert-danger">Đã xóa</div>
+            @endif
             <h1 class="card-title display-4">
-            {{ $post->title }} </h1>
+            {{ $post->title }} </h1> 
+            {{$post->requirement_payment}}
             <ul>
               <li>{{$post->content }}</li>
               <li>Số lượng đơn cần đặt: {{ $post->number_order }}</li>
@@ -23,7 +27,14 @@
               <li>Yêu Cầu Phương thức thanh toán: {{ getRequirementPayment($post->requirement_payment) }}</li>
               <li>Áp mã freeship: {{ getIsApplyFreeship($post->is_apply_freeship) }}</li>
             </ul>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal_view_link_order">Xem link đặt hàng</button>
+            <div class="row">
+              <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modal_view_link_order">Xem link đặt hàng</button>
+              @if ($post->user_id == Auth::id() && $post->is_deleted == 0)
+              <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#modal_edit_post">Sửa bài viết</button>
+              <button type="button" class="btn btn-primary btn-delete-post">Xóa bài viết</button>
+              @endif
+            </div>
+            <input type="hidden" id="postId" value="{{$post->id}}">
           </div>
           </article>
         </div>
@@ -33,112 +44,32 @@
       <div class="row">
         <h5 class="font-weight-bold">More like this</h5>
         <div class="card-columns">
-          <div class="card card-pin">
-            <img class="card-img" src="https://images.unsplash.com/photo-1518707399486-6d702a84ff00?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=b5bb16fa7eaed1a1ed47614488f7588d&auto=format&fit=crop&w=500&q=60" alt="Card image">
-            <div class="overlay">
-              <h2 class="card-title title">Some Title</h2>
-              <div class="more">
-                <a href="post.html">
-                <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
+          @foreach($postMoreLikeThis as $postLikeThis)
+            <a href="/post/{{$postLikeThis->postId}}">
+              <div class="card card-pin">
+                <img class="card-img" src="{{asset('storage/'.$postLikeThis->image)}}" alt="Card image">
+                <div class="">
+                  <div class="card-title title"><h5>{{ $postLikeThis->title }}</h5></div>
+                  <div class="">
+                    <a data-v-19eaa692="" href="/profile/71fa571fc4364e5dab9fe113b44003d1" class="author d-flex align-items-center float-left">
+                      <img style="width: 22px; height: 22px;object-fit: cover" alt="{{ $postLikeThis->name }}" title="Riviu" src="{{ $postLikeThis->avatar }}" class="rounded-circle mr-1" style="object-fit: cover;">
+                      <span data-v-19eaa692="" class="my-auto text-truncate">{{ $postLikeThis->name }}</span>
+                    </a>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          <div class="card card-pin">
-            <img class="card-img" src="https://images.unsplash.com/photo-1519408299519-b7a0274f7d67?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=d4891b98f4554cc55eab1e4a923cbdb1&auto=format&fit=crop&w=500&q=60" alt="Card image">
-            <div class="overlay">
-              <h2 class="card-title title">Some Title</h2>
-              <div class="more">
-                <a href="post.html">
-                <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-              </div>
-            </div>
-          </div>
-          <div class="card card-pin">
-            <img class="card-img" src="https://images.unsplash.com/photo-1506706435692-290e0c5b4505?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=0bb464bb1ceea5155bc079c4f50bc36a&auto=format&fit=crop&w=500&q=60" alt="Card image">
-            <div class="overlay">
-              <h2 class="card-title title">Some Title</h2>
-              <div class="more">
-                <a href="post.html">
-                <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-              </div>
-            </div>
-          </div>
-          <div class="card card-pin">
-            <img class="card-img" src="https://images.unsplash.com/photo-1512355144108-e94a235b10af?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=c622d56d975113a08c71c912618b5f83&auto=format&fit=crop&w=500&q=60" alt="Card image">
-            <div class="overlay">
-              <h2 class="card-title title">Some Title</h2>
-              <div class="more">
-                <a href="post.html">
-                <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-              </div>
-            </div>
-          </div>
-          <div class="card card-pin">
-            <img class="card-img" src="https://images.unsplash.com/photo-1518542331925-4e91e9aa0074?ixlib=rb-0.3.5&s=6958cfb3469de1e681bf17587bed53be&auto=format&fit=crop&w=500&q=60" alt="Card image">
-            <div class="overlay">
-              <h2 class="card-title title">Some Title</h2>
-              <div class="more">
-                <a href="post.html">
-                <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-              </div>
-            </div>
-          </div>
-          <div class="card card-pin">
-            <img class="card-img" src="https://images.unsplash.com/photo-1513028179155-324cfec2566c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=32ce1df4016dadc177d6fce1b2df2429&auto=format&fit=crop&w=350&q=80" alt="Card image">
-            <div class="overlay">
-              <h2 class="card-title title">Some Title</h2>
-              <div class="more">
-                <a href="post.html">
-                <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-              </div>
-            </div>
-          </div>
-          <div class="card card-pin">
-            <img class="card-img" src="https://images.unsplash.com/photo-1516601255109-506725109807?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=ce4f3db9818f60686e8e9b62d4920ce5&auto=format&fit=crop&w=500&q=60" alt="Card image">
-            <div class="overlay">
-              <h2 class="card-title title">Some Title</h2>
-              <div class="more">
-                <a href="post.html">
-                <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-              </div>
-            </div>
-          </div>
-          <div class="card card-pin">
-            <img class="card-img" src="https://images.unsplash.com/photo-1505210512658-3ae58ae08744?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=2ef2e23adda7b89a804cf232f57e3ca3&auto=format&fit=crop&w=333&q=80" alt="Card image">
-            <div class="overlay">
-              <h2 class="card-title title">Some Title</h2>
-              <div class="more">
-                <a href="post.html">
-                <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-              </div>
-            </div>
-          </div>
-          <div class="card card-pin">
-            <img class="card-img" src="https://images.unsplash.com/photo-1488353816557-87cd574cea04?ixlib=rb-0.3.5&s=06371203b2e3ad3e241c45f4e149a1b3&auto=format&fit=crop&w=334&q=80" alt="Card image">
-            <div class="overlay">
-              <h2 class="card-title title">Some Title</h2>
-              <div class="more">
-                <a href="post.html">
-                <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-              </div>
-            </div>
-          </div>
-          <div class="card card-pin">
-            <img class="card-img" src="https://images.unsplash.com/photo-1518450757707-d21c8c53c8df?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=c88b5f311958f841525fdb01ab3b5deb&auto=format&fit=crop&w=500&q=60" alt="Card image">
-            <div class="overlay">
-              <h2 class="card-title title">Some Title</h2>
-              <div class="more">
-                <a href="post.html">
-                <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-              </div>
-            </div>
-          </div>
+            </a>
+          @endforeach
+          
         </div>
       </div>
     </div>
     </section>
   </main>
   @include('posts.modal.modal_view_link_order')
+  @include('posts.modal.modal_edit_post')
+  @include('posts.modal.modal_confirm_delete_post')
+  <script type="text/javascript" src="{{ URL::asset('/assets/js/transaction_order/transaction_order.js') }}"></script>
 @endsection
 
 

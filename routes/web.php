@@ -23,7 +23,9 @@ Auth::routes();
 Route::get('/home', 'HomeController@index');
 
 Route::post('/post/create', 'PostController@create')->name('post-create');
+Route::post('/post/edit/{id}', 'PostController@edit')->name('post-edit');
 Route::get('/post/{id}', 'PostController@detail')->name('post-detail');
+Route::post('/post/delete/{id}', 'PostController@delete')->name('post-delete');
 Route::get('/post/member_submit_order/{id}', 'PostController@memberSubmitOrder')->name('member-submit-order');
 
 //self
